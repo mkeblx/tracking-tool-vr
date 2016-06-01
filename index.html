@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+  <title>drift tool VR</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+#container {
+  
+}
+
+#samples {
+  border: 1px solid black;
+}
+</style>
+</head>
+<body>
+<div id="container">
+  <h1>drift tool VR</h1>
+  <div id="samples">
+  </div>
+
+  <div id="buttons">
+    <input type="button" id="start-btn" value="Start">
+    <input type="button" id="pause-btn" value="Pause">
+    <input type="button" id="stop-btn" value="Stop">
+    <input type="button" id="clear-btn" value="Clear">
+  </div>
+
+  <div id="results">
+  </div>
+
+</div>
+
+<script src="js/three.min.js"></script>
+<script>
+
+var posSamples = [];
+var rotSamples = [];
+var collecting = false;
+
+var bounds = null;
+var firstPos = null;
+var range = null;
+
+var samplesEl = document.getElementById('samples');
+var resultsEl = document.getElementById('results');
+
+var startBtn = document.getElementById('start-btn');
+var pauseBtn = document.getElementById('pause-btn');
+var stopBtn = document.getElementById('stop-btn');
+var clearBtn = document.getElementById('clear-btn');
+
+var vrHMD;
+
+init();
+
+function init() {
+  navigator.getVRDisplays().then(function(displays){
+    if (displays.length)
+      vrHMD = displays[0];
+    console.log(vrHMD);
+  });
+
+
+  startBtn.addEventListener('click', function(event){
+    start();
+  });
+  pauseBtn.addEventListener('click', function(event){
+    pause();
+  });
+  stopBtn.addEventListener('click', function(event){
+    stop();
+  });
+  clearBtn.addEventListener('click', function(event){
+    clear();
+  });
+
+  requestAnimationFrame(animate);
+}
+
+function start() {
+  collecting = true;
+
+  firstPos = null;
+  bounds = new THREE.Box3();
+}
+
+function stop() {
+  collecting = false;
+
+  var vec = new THREE.Vector3().fromArray(firstPos);
+
+  bounds.translate( vec.negate() );
+
+  //
+}
+
+function pause() {
+  collecting = false;
+}
+
+function clear() {
+  samples = [];
+}
+
+function calculate() {
+  var vec = new THREE.Vector3().fromArray(firstPos);
+
+  var b = bounds.clone();
+
+  b.translate( vec.negate() );
+
+  resultsEl.innerHTML = Math.abs(b.max.x - b.min.x);
+}
+
+function animate(t) {
+  if (collecting) {
+
+    if (vrHMD) {
+      var pose = vrHMD.getPose();
+
+      var position = pose.position;
+      var orientation = pose.orientation;
+
+      samplesEl.innerHTML = position;
+
+      if (bounds.isEmpty()) {
+        firstPos = position;
+      }
+
+      bounds.expandByPoint({ x: position[0], y: position[1], z: position[2] });
+
+      if (firstPos != null)
+        calculate();
+    }
+
+  }
+
+  requestAnimationFrame(animate);
+}
+
+
+</script>
+</body>
+</html>
