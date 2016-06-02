@@ -124,6 +124,11 @@ var vrHMD;
 init();
 
 function init() {
+  if (!navigator.getVRDisplays) {
+    samplesEl.innerHTML = 'Sorry you need WebVR => <a href="http://webvr.info">WebVR</a>';
+    return;
+  }
+
   navigator.getVRDisplays().then(function(displays){
     if (displays.length)
       vrHMD = displays[0];
