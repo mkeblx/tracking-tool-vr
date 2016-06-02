@@ -30,13 +30,14 @@ h1 {
 }
 
 p {
-
+  margin: 0;
+  margin-bottom: 16px;
 }
 
 a {
   color: #000;
 }
-a:visited {
+a:hover, a:visited {
   color: #000;
 }
 
@@ -48,22 +49,25 @@ a:visited {
 
 }
 
-#samples {
+#timer {
+  float: right;
+}
+
+#samples, #results {
   border: 1px solid black;
-  font-family: monospace;
+  font-size: 20px;
   padding: 3px;
   margin: 10px 0px;
+}
+
+#samples {
 }
 
 #results {
-  border: 1px solid black;
-  font-family: monospace;
-  padding: 3px;
-  margin: 10px 0px;
 }
 
 #credits {
-
+  margin-top: 16px;
 }
 </style>
 </head>
@@ -72,10 +76,11 @@ a:visited {
   <h1>tracking tool VR</h1>
   <p>positional tracking precision tool</p>
   <div id="samples">
-  &nbsp;
+    position : [x,y,z]
   </div>
 
   <div id="buttons">
+    <span id="timer">0s</span>
     <input type="button" id="start-btn" value="Start">
     <input type="button" id="pause-btn" value="Pause" style="display: none">
     <input type="button" id="stop-btn" value="Stop">
@@ -83,11 +88,11 @@ a:visited {
   </div>
 
   <div id="results">
-  &nbsp;
+    bounds : [x,y,z]
   </div>
 
   <div id="credits">
-    mkeblx &middot; <a href="https://github.com/mkeblx">github</a> &middot; <a href="http://webvr.info">webvr.info</a>
+    mkeblx &middot; <a href="https://github.com/mkeblx/tracking-tool-vr">github</a> &middot; made with <a href="http://webvr.info">webvr</a>
   </div>
 
 </div>
@@ -110,6 +115,9 @@ var startBtn = document.getElementById('start-btn');
 var pauseBtn = document.getElementById('pause-btn');
 var stopBtn = document.getElementById('stop-btn');
 var clearBtn = document.getElementById('clear-btn');
+
+var timerEl = document.getElementById('timer');
+var startTime = 0;
 
 var vrHMD;
 
@@ -144,6 +152,8 @@ function start() {
 
   firstPos = null;
   bounds = new THREE.Box3();
+
+  startTime = Date.now();
 }
 
 function stop() {
@@ -157,8 +167,11 @@ function pause() {
 function clear() {
   samples = [];
 
-  samplesEl.innerHTML = '&nbsp;';
-  resultsEl.innerHTML = '&nbsp;';
+  samplesEl.innerHTML = 'position : [x,y,z]';
+  resultsEl.innerHTML = 'bounds : [x,y,z]';
+
+  timerEl.innerHTML = '0s';
+  startTime = 0;
 }
 
 // format point
@@ -201,6 +214,8 @@ function animate(t) {
       if (firstPos != null)
         calculate();
     }
+
+    timerEl.innerHTML = ((Date.now() - startTime) / 1000).toFixed(2) + "s";
 
   }
 

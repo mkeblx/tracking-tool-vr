@@ -1,5 +1,4 @@
-drift tool VR
+tracking tool VR
 =============
-Basic tool for measuring the sensor precision of a VR tracking system.
-
+Basic tool for measuring the precision of a VR tracking system.
 
