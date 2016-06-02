@@ -85,6 +85,7 @@ a:hover, a:visited {
     <input type="button" id="pause-btn" value="Pause" style="display: none">
     <input type="button" id="stop-btn" value="Stop">
     <input type="button" id="clear-btn" value="Clear">
+    <input type="button" id="reset-sensor-btn" value="Reset Sensor">
   </div>
 
   <div id="results">
@@ -115,6 +116,7 @@ var startBtn = document.getElementById('start-btn');
 var pauseBtn = document.getElementById('pause-btn');
 var stopBtn = document.getElementById('stop-btn');
 var clearBtn = document.getElementById('clear-btn');
+var resetSensorBtn = document.getElementById('reset-sensor-btn');
 
 var timerEl = document.getElementById('timer');
 var startTime = 0;
@@ -148,6 +150,9 @@ function init() {
   clearBtn.addEventListener('click', function(event){
     clear();
   });
+  resetSensorBtn.addEventListener('click', function(event){
+    resetSensor();
+  });
 
   requestAnimationFrame(animate);
 }
@@ -177,6 +182,10 @@ function clear() {
 
   timerEl.innerHTML = '0s';
   startTime = 0;
+}
+
+function resetSensor() {
+  vrHMD && vrHMD.resetPose();
 }
 
 // format point
