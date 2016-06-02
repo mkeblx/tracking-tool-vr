@@ -19,8 +19,8 @@ body {
 
 #container {
   margin: 10px auto;
-  border: 1px solid black;
-  width: 640px;
+  outline: 1px solid black;
+  width: 540px;
   padding: 10px;
 }
 
@@ -54,9 +54,9 @@ a:hover, a:visited {
 }
 
 #samples, #results {
-  border: 1px solid black;
+  outline: 1px solid black;
   font-size: 20px;
-  padding: 3px;
+  padding: 3px 6px;
   margin: 10px 0px;
 }
 
@@ -64,6 +64,14 @@ a:hover, a:visited {
 }
 
 #results {
+}
+
+#canvas-container {
+  outline: 1px solid #000;
+  height: 512px;
+}
+#canvas-container canvas {
+
 }
 
 #credits {
@@ -90,6 +98,9 @@ a:hover, a:visited {
 
   <div id="results">
     bounds : [x,y,z]
+  </div>
+
+  <div id="canvas-container">
   </div>
 
   <div id="credits">
@@ -123,6 +134,12 @@ var startTime = 0;
 
 var vrHMD;
 
+var canvas;
+var scene, camera;
+var renderer;
+var points = [];
+var boundsBox;
+
 init();
 
 function init() {
@@ -154,7 +171,29 @@ function init() {
     resetSensor();
   });
 
+  setup3d();
+
   requestAnimationFrame(animate);
+}
+
+function setup3d() {
+  scene = new THREE.Scene();
+
+  camera = new THREE.PerspectiveCamera(75, 512/512, 0.1, 1000);
+  camera.position.z = 5;
+  scene.add(camera);
+
+  var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+  var material = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } );
+  boundsBox = new THREE.Mesh( geometry, material );
+  scene.add( boundsBox );
+
+  var axisHelper = new THREE.AxisHelper(1);
+  scene.add( axisHelper );
+
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize( 512,512 );
+  document.getElementById('canvas-container').appendChild( renderer.domElement );
 }
 
 function start() {
@@ -207,9 +246,18 @@ function calculate() {
   range[1] = Math.abs(b.max.y - b.min.y) * 1000;
   range[2] = Math.abs(b.max.z - b.min.z) * 1000;
   resultsEl.innerHTML = format(range, 3, "mm");
+
+  // todo: update boundsBox size, via scale
 }
 
 function animate(t) {
+  update(t);
+  render(t);
+
+  requestAnimationFrame(animate);
+}
+
+function update(t) {
   if (collecting) {
 
     if (vrHMD) {
@@ -233,10 +281,11 @@ function animate(t) {
     timerEl.innerHTML = ((Date.now() - startTime) / 1000).toFixed(2) + "s";
 
   }
-
-  requestAnimationFrame(animate);
 }
 
+function render(t) {
+  renderer.render(scene, camera);
+}
 
 </script>
 </body>
