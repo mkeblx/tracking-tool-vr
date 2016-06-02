@@ -175,9 +175,10 @@ function clear() {
 }
 
 // format point
-function format(pt, n) {
+function format(pt, n, units) {
+  units = units || '';
   n = n || 5;
-  return pt[0].toFixed(n) + "," + pt[1].toFixed(n) + "," + pt[2].toFixed(n);
+  return pt[0].toFixed(n) +units+", " + pt[1].toFixed(n) +units+", " + pt[2].toFixed(n) +units;
 }
 
 function calculate() {
@@ -188,10 +189,10 @@ function calculate() {
   b.translate( vec.negate() );
 
   var range = [];
-  range[0] = Math.abs(b.max.x - b.min.x);
-  range[1] = Math.abs(b.max.y - b.min.y);
-  range[2] = Math.abs(b.max.z - b.min.z);
-  resultsEl.innerHTML = format(range, 7);
+  range[0] = Math.abs(b.max.x - b.min.x) * 1000;
+  range[1] = Math.abs(b.max.y - b.min.y) * 1000;
+  range[2] = Math.abs(b.max.z - b.min.z) * 1000;
+  resultsEl.innerHTML = format(range, 3, "mm");
 }
 
 function animate(t) {
