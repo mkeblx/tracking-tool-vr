@@ -2,10 +2,13 @@
 <html>
 <head>
 <meta charset="utf-8">
-  <title>drift tool VR</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>tracking tool VR</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500" rel="stylesheet">
 <style>
 * {
   box-sizing: border-box;
+  font-family: 'Roboto Mono', monospace;
 }
 
 body {
@@ -15,28 +18,76 @@ body {
 }
 
 #container {
-  
+  margin: 10px auto;
+  border: 1px solid black;
+  width: 640px;
+  padding: 10px;
+}
+
+h1 {
+  font-weight: 400;
+  margin: 0;
+}
+
+p {
+
+}
+
+a {
+  color: #000;
+}
+a:visited {
+  color: #000;
+}
+
+#buttons {
+
+}
+
+#buttons input {
+
 }
 
 #samples {
   border: 1px solid black;
+  font-family: monospace;
+  padding: 3px;
+  margin: 10px 0px;
+}
+
+#results {
+  border: 1px solid black;
+  font-family: monospace;
+  padding: 3px;
+  margin: 10px 0px;
+}
+
+#credits {
+
 }
 </style>
 </head>
 <body>
 <div id="container">
-  <h1>drift tool VR</h1>
+  <h1>tracking tool VR</h1>
+  <p>positional tracking precision tool</p>
   <div id="samples">
+  &nbsp;
   </div>
 
   <div id="buttons">
     <input type="button" id="start-btn" value="Start">
-    <input type="button" id="pause-btn" value="Pause">
+    <input type="button" id="pause-btn" value="Pause" style="display: none">
     <input type="button" id="stop-btn" value="Stop">
     <input type="button" id="clear-btn" value="Clear">
   </div>
 
   <div id="results">
+  &nbsp;
+  </div>
+
+  <div id="credits">
+    mkeblx &middot; <a href="https://github.com/mkeblx">github</a> &middot; <a href="http://webvr.info">webvr.info</a>
   </div>
 
 </div>
@@ -97,12 +148,6 @@ function start() {
 
 function stop() {
   collecting = false;
-
-  var vec = new THREE.Vector3().fromArray(firstPos);
-
-  bounds.translate( vec.negate() );
-
-  //
 }
 
 function pause() {
@@ -111,6 +156,15 @@ function pause() {
 
 function clear() {
   samples = [];
+
+  samplesEl.innerHTML = '&nbsp;';
+  resultsEl.innerHTML = '&nbsp;';
+}
+
+// format point
+function format(pt, n) {
+  n = n || 5;
+  return pt[0].toFixed(n) + "," + pt[1].toFixed(n) + "," + pt[2].toFixed(n);
 }
 
 function calculate() {
@@ -120,7 +174,11 @@ function calculate() {
 
   b.translate( vec.negate() );
 
-  resultsEl.innerHTML = Math.abs(b.max.x - b.min.x);
+  var range = [];
+  range[0] = Math.abs(b.max.x - b.min.x);
+  range[1] = Math.abs(b.max.y - b.min.y);
+  range[2] = Math.abs(b.max.z - b.min.z);
+  resultsEl.innerHTML = format(range, 7);
 }
 
 function animate(t) {
@@ -132,7 +190,7 @@ function animate(t) {
       var position = pose.position;
       var orientation = pose.orientation;
 
-      samplesEl.innerHTML = position;
+      samplesEl.innerHTML = format(position);
 
       if (bounds.isEmpty()) {
         firstPos = position;
