@@ -188,7 +188,7 @@ function setup3d() {
   boundsBox = new THREE.Mesh( geometry, material );
   //scene.add( boundsBox );
 
-  var boxHelper = new THREE.BoxHelper( boundsBox );
+  var boxHelper = new THREE.BoxHelper( boundsBox, 0xffff00 );
   scene.add( boxHelper );
 
   var axisHelper = new THREE.AxisHelper(1);
