@@ -111,6 +111,7 @@ a:hover, a:visited {
 
 <script src="js/three.min.js"></script>
 <script>
+'use strict';
 
 var posSamples = [];
 var rotSamples = [];
@@ -138,7 +139,9 @@ var canvas;
 var scene, camera;
 var renderer;
 var points = [];
+
 var boundsBox;
+var boxHelper;
 
 init();
 
@@ -188,7 +191,7 @@ function setup3d() {
   boundsBox = new THREE.Mesh( geometry, material );
   //scene.add( boundsBox );
 
-  var boxHelper = new THREE.BoxHelper( boundsBox, 0xffff00 );
+  boxHelper = new THREE.BoxHelper( boundsBox, 0xffff00 );
   scene.add( boxHelper );
 
   var axisHelper = new THREE.AxisHelper(1);
@@ -245,12 +248,15 @@ function calculate() {
   b.translate( vec.negate() );
 
   var range = [];
-  range[0] = Math.abs(b.max.x - b.min.x) * 1000;
-  range[1] = Math.abs(b.max.y - b.min.y) * 1000;
-  range[2] = Math.abs(b.max.z - b.min.z) * 1000;
-  resultsEl.innerHTML = format(range, 3, "mm");
+  range[0] = Math.abs(b.max.x - b.min.x);
+  range[1] = Math.abs(b.max.y - b.min.y);
+  range[2] = Math.abs(b.max.z - b.min.z);
+  var rangeMM = range.map(function(v){ return v*1000; });
+  resultsEl.innerHTML = format(rangeMM, 2, "mm");
 
   // todo: update boundsBox size, via scale
+  boundsBox.scale.set(range[0], range[1], range[2]);
+  boxHelper.update( boundsBox );
 }
 
 function animate(t) {
