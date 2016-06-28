@@ -141,6 +141,8 @@ var points = [];
 var boundsBox;
 var boxHelper;
 
+var hmd;
+
 var controls;
 
 init();
@@ -184,13 +186,13 @@ function init() {
 function setup3d() {
   scene = new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(75, 512/512, 0.001, 10);
-  camera.position.z = 0.13;
-  camera.position.x = 0.04;
-  camera.position.y = 0.07;
+  camera = new THREE.PerspectiveCamera(75, 512/512, 0.0001, 100);
+  camera.position.z = 1.3;
+  camera.position.x = 0.4;
+  camera.position.y = 0.2;
   scene.add(camera);
 
-  var geometry = new THREE.BoxGeometry( 0.1, 0.1, 0.1 );
+  var geometry = new THREE.BoxGeometry( 1, 1, 1 );
   var material = new THREE.MeshBasicMaterial( { color: 0x00ff00, wireframe: true } );
   boundsBox = new THREE.Mesh( geometry, material );
   //scene.add( boundsBox );
@@ -200,10 +202,20 @@ function setup3d() {
   boxHelper = new THREE.BoxHelper( boundsBox, 0xffff00 );
   scene.add( boxHelper );
 
-  var axisHelper = new THREE.AxisHelper( 0.01 );
+  var axisHelper = new THREE.AxisHelper( 0.1 );
   scene.add( axisHelper );
 
-  renderer = new THREE.WebGLRenderer();
+  var geo = new THREE.SphereGeometry(0.03);
+  var mat = new THREE.MeshBasicMaterial({
+    color: 0xff00ff
+  });
+  hmd = new THREE.Mesh(geo, mat);
+  hmd.visible = false;
+  scene.add( hmd );
+
+  renderer = new THREE.WebGLRenderer({
+    antialias: false
+  });
   renderer.setSize( 512,512 );
   document.getElementById('canvas-container').appendChild( renderer.domElement );
 
@@ -219,10 +231,14 @@ function start() {
   bounds = new THREE.Box3();
 
   startTime = Date.now();
+
+  hmd.visible = true;
 }
 
 function stop() {
   collecting = false;
+
+  hmd.visible = false;
 }
 
 function clear() {
@@ -284,6 +300,8 @@ function update(t) {
 
       var position = pose.position;
       var orientation = pose.orientation;
+
+      hmd.position.fromArray(position);
 
       samplesEl.innerHTML = format(position);
 
