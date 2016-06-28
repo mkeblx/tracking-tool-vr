@@ -90,8 +90,6 @@ a:hover, a:visited {
   <div id="buttons">
     <span id="timer">0s</span>
     <input type="button" id="start-btn" value="Start">
-    <input type="button" id="pause-btn" value="Pause" style="display: none">
-    <input type="button" id="stop-btn" value="Stop">
     <input type="button" id="clear-btn" value="Clear">
     <input type="button" id="reset-sensor-btn" value="Reset Sensor">
   </div>
@@ -125,8 +123,6 @@ var samplesEl = document.getElementById('samples');
 var resultsEl = document.getElementById('results');
 
 var startBtn = document.getElementById('start-btn');
-var pauseBtn = document.getElementById('pause-btn');
-var stopBtn = document.getElementById('stop-btn');
 var clearBtn = document.getElementById('clear-btn');
 var resetSensorBtn = document.getElementById('reset-sensor-btn');
 
@@ -159,19 +155,21 @@ function init() {
 
 
   startBtn.addEventListener('click', function(event){
-    start();
-  });
-  pauseBtn.addEventListener('click', function(event){
-    pause();
-  });
-  stopBtn.addEventListener('click', function(event){
-    stop();
+    if (!collecting) {
+      startBtn.value = 'Stop';
+      start();
+    } else {
+      stop();
+      startBtn.value = 'Start';
+    }
   });
   clearBtn.addEventListener('click', function(event){
-    clear();
+    //if (!collecting)
+      clear();
   });
   resetSensorBtn.addEventListener('click', function(event){
-    resetSensor();
+    if (!collecting)
+      resetSensor();
   });
 
   setup3d();
@@ -215,18 +213,17 @@ function stop() {
   collecting = false;
 }
 
-function pause() {
-  collecting = false;
-}
-
 function clear() {
-  samples = [];
+  //samples = [];
 
   samplesEl.innerHTML = 'position : [x,y,z]';
   resultsEl.innerHTML = 'bounds : [x,y,z]';
 
   timerEl.innerHTML = '0s';
-  startTime = 0;
+
+  firstPos = null;
+  bounds = new THREE.Box3();
+  startTime = Date.now();
 }
 
 function resetSensor() {
